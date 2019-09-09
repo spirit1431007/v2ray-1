@@ -148,7 +148,8 @@ on_install() {
   latest_v2ray_version=`curl -s -I "${official_v2ray_link}/latest" | grep Location | grep -o "tag.*" | grep -o "v[0-9.]*"`
   if [ "${latest_v2ray_version}" = "" ] ; then
     ui_print "Error: Connect official V2Ray download link failed." 
-    exit 1
+    ui_print "Use default verision:v4.20.0"
+    latest_v2ray_version = "v4.20.0"
   fi
   ui_print "- Download latest V2Ray core ${latest_v2ray_version}-${ARCH}"
   case "${ARCH}" in
@@ -168,8 +169,12 @@ on_install() {
   download_v2ray_zip="/data/v2ray/run/v2ray-core.zip"
   curl "${download_v2ray_link}" -L -o "${download_v2ray_zip}" >&2
   if [ "$?" != "0" ] ; then
-    ui_print "Error: Download V2Ray core failed."
-    exit 1
+    ui_print "Error: Download V2Ray core failed.Try to use local file."
+     if [ ! -f "$download_v2ray_zip" ]; then
+        ui_print "Local V2ray core not found.Please download V2ray core from ${download_v2ray_link} and move it to ${download_v2ray_zip}"
+        exit 1
+    fi
+    
   fi
   
   # install v2ray execute file
